@@ -12,6 +12,11 @@
  * IMPORTANT:
  * Submission only writes to Attendance Responses.
  * The IT sheets are updated separately.
+ *
+ * DYNAMIC EVENTS:
+ *     Changes to the Events sheet automatically rebuild
+ *     IT1 / IT2 / IT3 so attendance follows the event
+ *     even when events are moved or new events are added.
  *******************************************************/
 
 
@@ -20,17 +25,27 @@
 // =====================================================
 
 const CONFIG = {
+
   RESPONSE_SHEET: "Attendance Responses",
+
   EVENTS_SHEET: "Events",
 
-  SECTION_SHEETS: ["IT1", "IT2", "IT3"],
+  SECTION_SHEETS: [
+    "IT1",
+    "IT2",
+    "IT3"
+  ],
 
   DATE_ROW: 3,
+
   EVENT_ROW: 4,
+
   HOUR_ROW: 5,
+
   HEADER_ROW: 6,
 
   ROLL_COLUMN: 1,
+
   NAME_COLUMN: 2,
 
   FIRST_EVENT_COLUMN: 3,
@@ -38,6 +53,7 @@ const CONFIG = {
   HOURS_PER_EVENT: 6,
 
   MARK: "P"
+
 };
 
 
@@ -48,12 +64,22 @@ const CONFIG = {
 function doGet() {
 
   return HtmlService
+
     .createHtmlOutputFromFile("index")
-    .setTitle("Placement Attendance")
+
+    .setTitle(
+      "Placement Attendance"
+    )
+
+    // IMPORTANT FOR MOBILE RESPONSIVENESS
+    // Apps Script ignores a viewport meta tag placed
+    // directly inside the HTML file.
+
     .addMetaTag(
       "viewport",
       "width=device-width, initial-scale=1"
     )
+
     .setXFrameOptionsMode(
       HtmlService.XFrameOptionsMode.ALLOWALL
     );
@@ -67,77 +93,178 @@ function doGet() {
 
 function getEvents() {
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss =
+    SpreadsheetApp.getActiveSpreadsheet();
 
-  const sheet = ss.getSheetByName(CONFIG.EVENTS_SHEET);
+  const sheet =
+    ss.getSheetByName(
+      CONFIG.EVENTS_SHEET
+    );
 
   if (!sheet) {
-    throw new Error('Sheet "Events" was not found.');
+
+    throw new Error(
+      'Sheet "Events" was not found.'
+    );
+
   }
 
-  const lastRow = sheet.getLastRow();
-  const lastColumn = sheet.getLastColumn();
 
-  if (lastRow < 2 || lastColumn < 1) {
+  const lastRow =
+    sheet.getLastRow();
+
+  const lastColumn =
+    sheet.getLastColumn();
+
+
+  if (
+    lastRow < 2 ||
+    lastColumn < 1
+  ) {
+
     return [];
+
   }
 
-  const values = sheet
-    .getRange(1, 1, lastRow, lastColumn)
-    .getDisplayValues();
 
-  const headers = values[0].map(normalizeText);
+  const values =
+    sheet
+      .getRange(
+        1,
+        1,
+        lastRow,
+        lastColumn
+      )
+      .getDisplayValues();
 
-  let dateColumn = findHeaderColumn(headers, ["date"]);
-  let companyColumn = findHeaderColumn(
-    headers,
-    ["company", "company name"]
-  );
-  let eventColumn = findHeaderColumn(
-    headers,
-    ["event", "event name"]
-  );
 
-  // Fallback
-  if (dateColumn === -1) dateColumn = 0;
-  if (companyColumn === -1) companyColumn = 1;
-  if (eventColumn === -1) eventColumn = 2;
+  const headers =
+    values[0].map(
+      normalizeText
+    );
+
+
+  let dateColumn =
+    findHeaderColumn(
+      headers,
+      ["date"]
+    );
+
+
+  let companyColumn =
+    findHeaderColumn(
+      headers,
+      [
+        "company",
+        "company name"
+      ]
+    );
+
+
+  let eventColumn =
+    findHeaderColumn(
+      headers,
+      [
+        "event",
+        "event name"
+      ]
+    );
+
+
+  // ---------------------------------------------------
+  // FALLBACK COLUMNS
+  // ---------------------------------------------------
+
+  if (dateColumn === -1) {
+    dateColumn = 0;
+  }
+
+  if (companyColumn === -1) {
+    companyColumn = 1;
+  }
+
+  if (eventColumn === -1) {
+    eventColumn = 2;
+  }
+
 
   const events = [];
 
-  for (let r = 1; r < values.length; r++) {
 
-    const row = values[r];
+  // ---------------------------------------------------
+  // READ EVENTS
+  // ---------------------------------------------------
 
-    const rawDate = row[dateColumn];
+  for (
+    let r = 1;
+    r < values.length;
+    r++
+  ) {
 
-    const company = String(
-      row[companyColumn] || ""
-    ).trim();
+    const row =
+      values[r];
 
-    const event = String(
-      row[eventColumn] || ""
-    ).trim();
 
-    if (!rawDate || !company || !event) {
+    const rawDate =
+      row[dateColumn];
+
+
+    const company =
+      String(
+        row[companyColumn] || ""
+      ).trim();
+
+
+    const event =
+      String(
+        row[eventColumn] || ""
+      ).trim();
+
+
+    if (
+      !rawDate ||
+      !company ||
+      !event
+    ) {
+
       continue;
+
     }
 
-    const date = normalizeDate(rawDate);
+
+    const date =
+      normalizeDate(
+        rawDate
+      );
+
 
     if (!date) {
+
       continue;
+
     }
 
+
     events.push({
+
       date: date,
+
       company: company,
+
       event: event,
-      display: company + " - " + event
+
+      display:
+        company +
+        " - " +
+        event
+
     });
+
   }
 
+
   return events;
+
 }
 
 
@@ -145,23 +272,41 @@ function getEvents() {
 // FIND HEADER
 // =====================================================
 
-function findHeaderColumn(headers, possibleNames) {
+function findHeaderColumn(
+  headers,
+  possibleNames
+) {
 
-  for (let i = 0; i < headers.length; i++) {
+  for (
+    let i = 0;
+    i < headers.length;
+    i++
+  ) {
 
-    for (let j = 0; j < possibleNames.length; j++) {
+    for (
+      let j = 0;
+      j < possibleNames.length;
+      j++
+    ) {
 
       if (
         headers[i] ===
-        normalizeText(possibleNames[j])
+        normalizeText(
+          possibleNames[j]
+        )
       ) {
+
         return i;
+
       }
 
     }
+
   }
 
+
   return -1;
+
 }
 
 
@@ -169,103 +314,194 @@ function findHeaderColumn(headers, possibleNames) {
 // SUBMIT ATTENDANCE
 //
 // IMPORTANT:
-// This function intentionally DOES NOT update IT1/IT2/IT3.
+// This function DOES NOT update IT1/IT2/IT3.
 //
 // It only:
 //   1. validates
-//   2. checks duplicate
-//   3. writes one row to Attendance Responses
+//   2. verifies roll number belongs to section
+//   3. checks duplicate
+//   4. writes one row to Attendance Responses
 //
 // This keeps submission extremely fast.
 // =====================================================
 
-function submitAttendance(formData) {
+function submitAttendance(
+  formData
+) {
 
-  if (!formData || typeof formData !== "object") {
-    throw new Error("No attendance data received.");
+  if (
+    !formData ||
+    typeof formData !== "object"
+  ) {
+
+    throw new Error(
+      "No attendance data received."
+    );
+
   }
 
-  const fullName = String(
-    formData.fullName || ""
-  ).trim();
 
-  const rollNumber = String(
-    formData.rollNumber || ""
-  ).trim();
+  // ---------------------------------------------------
+  // READ FORM DATA
+  // ---------------------------------------------------
 
-  const section = normalizeSection(
-    formData.section
-  );
+  const fullName =
+    String(
+      formData.fullName || ""
+    ).trim();
 
-  const date = String(
-    formData.date || ""
-  ).trim();
 
-  const company = String(
-    formData.company || ""
-  ).trim();
+  const rollNumber =
+    String(
+      formData.rollNumber || ""
+    ).trim();
 
-  const eventName = String(
-    formData.event || ""
-  ).trim();
 
-  const proofLink = String(
-    formData.proofLink || ""
-  ).trim();
+  const section =
+    normalizeSection(
+      formData.section
+    );
 
-  let hours = formData.hours || [];
 
-  if (!Array.isArray(hours)) {
-    hours = String(hours)
-      .split(",")
-      .map(function (h) {
-        return String(h).trim();
-      })
-      .filter(Boolean);
+  const date =
+    String(
+      formData.date || ""
+    ).trim();
+
+
+  const company =
+    String(
+      formData.company || ""
+    ).trim();
+
+
+  const eventName =
+    String(
+      formData.event || ""
+    ).trim();
+
+
+  const proofLink =
+    String(
+      formData.proofLink || ""
+    ).trim();
+
+
+  let hours =
+    formData.hours || [];
+
+
+  if (
+    !Array.isArray(hours)
+  ) {
+
+    hours =
+      String(hours)
+        .split(",")
+        .map(function(h) {
+
+          return String(h).trim();
+
+        })
+        .filter(Boolean);
+
   }
+
 
   // ---------------------------------------------------
   // VALIDATION
   // ---------------------------------------------------
 
   if (!fullName) {
-    throw new Error("Full Name is required.");
+
+    throw new Error(
+      "Full Name is required."
+    );
+
   }
+
 
   if (!rollNumber) {
-    throw new Error("Roll Number is required.");
+
+    throw new Error(
+      "Roll Number is required."
+    );
+
   }
 
-  if (!["IT1", "IT2", "IT3"].includes(section)) {
-    throw new Error("Please select a valid section.");
+
+  if (
+    ![
+      "IT1",
+      "IT2",
+      "IT3"
+    ].includes(section)
+  ) {
+
+    throw new Error(
+      "Please select a valid section."
+    );
+
   }
+
 
   if (!date) {
-    throw new Error("Date is required.");
+
+    throw new Error(
+      "Date is required."
+    );
+
   }
+
 
   if (!company) {
-    throw new Error("Company is required.");
+
+    throw new Error(
+      "Company is required."
+    );
+
   }
+
 
   if (!eventName) {
-    throw new Error("Event is required.");
+
+    throw new Error(
+      "Event is required."
+    );
+
   }
 
-  if (hours.length === 0) {
+
+  if (
+    hours.length === 0
+  ) {
+
     throw new Error(
       "Please select at least one class hour."
     );
+
   }
+
 
   if (!proofLink) {
-    throw new Error("Proof link is required.");
+
+    throw new Error(
+      "Proof link is required."
+    );
+
   }
 
-  if (!/^https?:\/\//i.test(proofLink)) {
+
+  if (
+    !/^https?:\/\//i.test(
+      proofLink
+    )
+  ) {
+
     throw new Error(
       "Please enter a valid proof link."
     );
+
   }
 
 
@@ -274,29 +510,44 @@ function submitAttendance(formData) {
   // ---------------------------------------------------
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp
+      .getActiveSpreadsheet();
+
 
   const responseSheet =
-    ss.getSheetByName(CONFIG.RESPONSE_SHEET);
+    ss.getSheetByName(
+      CONFIG.RESPONSE_SHEET
+    );
+
 
   if (!responseSheet) {
+
     throw new Error(
       'Sheet "Attendance Responses" was not found.'
     );
+
   }
 
-  // ---------------------------------------------------
+
+  // ===================================================
   // VERIFY ROLL NUMBER BELONGS TO SECTION
-  // ---------------------------------------------------
+  // ===================================================
 
   const sectionSheet =
-    ss.getSheetByName(section);
+    ss.getSheetByName(
+      section
+    );
+
 
   if (!sectionSheet) {
+
     throw new Error(
-      "Section sheet not found: " + section
+      "Section sheet not found: " +
+      section
     );
+
   }
+
 
   const studentRow =
     findStudentRow(
@@ -304,19 +555,25 @@ function submitAttendance(formData) {
       rollNumber
     );
 
-  if (studentRow === -1) {
+
+  if (
+    studentRow === -1
+  ) {
+
     throw new Error(
-      "Roll Number " +
+      "Roll number " +
       rollNumber +
-      " not in " +
+      " is not registered in " +
       section +
-      "."
+      ". Please check your roll number and section."
     );
+
   }
 
-  // ---------------------------------------------------
+
+  // ===================================================
   // DUPLICATE CHECK
-  // ---------------------------------------------------
+  // ===================================================
 
   if (
     checkDuplicateSubmission(
@@ -333,21 +590,31 @@ function submitAttendance(formData) {
       rollNumber +
       "."
     );
+
   }
 
 
-  // ---------------------------------------------------
+  // ===================================================
   // ADD RESPONSE
   //
-  // ONE spreadsheet write.
-  // ---------------------------------------------------
+  // ONE SPREADSHEET WRITE
+  // ===================================================
 
-  const hoursText = hours.join(", ");
+  const hoursText =
+    hours.join(", ");
 
-  const newRow = responseSheet.getLastRow() + 1;
+
+  const newRow =
+    responseSheet.getLastRow() + 1;
+
 
   responseSheet
-    .getRange(newRow, 1, 1, 9)
+    .getRange(
+      newRow,
+      1,
+      1,
+      9
+    )
     .setValues([[
       new Date(),
       fullName,
@@ -361,15 +628,21 @@ function submitAttendance(formData) {
     ]]);
 
 
-  // ---------------------------------------------------
+  // ===================================================
   // RETURN IMMEDIATELY
-  // ---------------------------------------------------
+  // ===================================================
 
   return {
+
     success: true,
+
     row: newRow,
-    message: "Attendance submitted successfully."
+
+    message:
+      "Attendance submitted successfully."
+
   };
+
 }
 
 
@@ -385,54 +658,92 @@ function checkDuplicateSubmission(
   eventName
 ) {
 
-  const lastRow = sheet.getLastRow();
+  const lastRow =
+    sheet.getLastRow();
 
-  if (lastRow < 2) {
+
+  if (
+    lastRow < 2
+  ) {
+
     return false;
+
   }
 
-  // Only read columns C:G.
+
+  // ---------------------------------------------------
+  // ONLY READ C:G
+  //
   // C = Roll
   // D = Section
   // E = Date
   // F = Company
   // G = Event
+  // ---------------------------------------------------
 
-  const values = sheet
-    .getRange(
-      2,
-      3,
-      lastRow - 1,
-      5
-    )
-    .getDisplayValues();
+  const values =
+    sheet
+      .getRange(
+        2,
+        3,
+        lastRow - 1,
+        5
+      )
+      .getDisplayValues();
+
 
   const targetRoll =
-    normalizeRollNumber(rollNumber);
+    normalizeRollNumber(
+      rollNumber
+    );
+
 
   const targetDate =
-    normalizeDate(date);
+    normalizeDate(
+      date
+    );
+
 
   const targetCompany =
-    normalizeText(company);
+    normalizeText(
+      company
+    );
+
 
   const targetEvent =
-    normalizeText(eventName);
+    normalizeText(
+      eventName
+    );
 
 
-  for (let i = 0; i < values.length; i++) {
+  for (
+    let i = 0;
+    i < values.length;
+    i++
+  ) {
 
     const existingRoll =
-      normalizeRollNumber(values[i][0]);
+      normalizeRollNumber(
+        values[i][0]
+      );
+
 
     const existingDate =
-      normalizeDate(values[i][2]);
+      normalizeDate(
+        values[i][2]
+      );
+
 
     const existingCompany =
-      normalizeText(values[i][3]);
+      normalizeText(
+        values[i][3]
+      );
+
 
     const existingEvent =
-      normalizeText(values[i][4]);
+      normalizeText(
+        values[i][4]
+      );
 
 
     if (
@@ -441,11 +752,16 @@ function checkDuplicateSubmission(
       existingCompany === targetCompany &&
       existingEvent === targetEvent
     ) {
+
       return true;
+
     }
+
   }
 
+
   return false;
+
 }
 
 
@@ -458,42 +774,83 @@ function checkDuplicateSubmission(
 // so the user does not wait for spreadsheet formatting.
 // =====================================================
 
-function syncResponseRow(rowNumber) {
+function syncResponseRow(
+  rowNumber
+) {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp
+      .getActiveSpreadsheet();
+
 
   const responseSheet =
-    ss.getSheetByName(CONFIG.RESPONSE_SHEET);
+    ss.getSheetByName(
+      CONFIG.RESPONSE_SHEET
+    );
+
 
   if (!responseSheet) {
+
     throw new Error(
       'Sheet "Attendance Responses" was not found.'
     );
+
   }
+
 
   if (
     !rowNumber ||
     rowNumber < 2 ||
-    rowNumber > responseSheet.getLastRow()
+    rowNumber >
+      responseSheet.getLastRow()
   ) {
+
     return;
+
   }
 
 
-  const row = responseSheet
-    .getRange(rowNumber, 1, 1, 9)
-    .getDisplayValues()[0];
+  const row =
+    responseSheet
+      .getRange(
+        rowNumber,
+        1,
+        1,
+        9
+      )
+      .getDisplayValues()[0];
 
 
-  const fullName = row[1];
-  const rollNumber = row[2];
-  const section = row[3];
-  const date = row[4];
-  const company = row[5];
-  const eventName = row[6];
-  const hoursText = row[7];
-  const proofLink = row[8];
+  const fullName =
+    row[1];
+
+
+  const rollNumber =
+    row[2];
+
+
+  const section =
+    row[3];
+
+
+  const date =
+    row[4];
+
+
+  const company =
+    row[5];
+
+
+  const eventName =
+    row[6];
+
+
+  const hoursText =
+    row[7];
+
+
+  const proofLink =
+    row[8];
 
 
   if (
@@ -504,28 +861,43 @@ function syncResponseRow(rowNumber) {
     !eventName ||
     !hoursText
   ) {
+
     return;
+
   }
 
 
-  const hours = hoursText
-    .split(",")
-    .map(function (h) {
-      return h.trim();
-    })
-    .filter(Boolean);
+  const hours =
+    hoursText
+      .split(",")
+      .map(function(h) {
+
+        return h.trim();
+
+      })
+      .filter(Boolean);
 
 
   mirrorAttendance(
+
     ss,
+
     rollNumber,
+
     section,
+
     date,
+
     company,
+
     eventName,
+
     hours,
+
     proofLink
+
   );
+
 }
 
 
@@ -545,17 +917,30 @@ function mirrorAttendance(
 ) {
 
   const sheetName =
-    normalizeSection(section);
+    normalizeSection(
+      section
+    );
+
 
   const sheet =
-    ss.getSheetByName(sheetName);
+    ss.getSheetByName(
+      sheetName
+    );
+
 
   if (!sheet) {
+
     throw new Error(
-      "Sheet not found: " + sheetName
+      "Sheet not found: " +
+      sheetName
     );
+
   }
 
+
+  // ---------------------------------------------------
+  // FIND STUDENT
+  // ---------------------------------------------------
 
   const studentRow =
     findStudentRow(
@@ -563,15 +948,29 @@ function mirrorAttendance(
       rollNumber
     );
 
-  if (studentRow === -1) {
+
+  if (
+    studentRow === -1
+  ) {
+
     throw new Error(
       "Student " +
       rollNumber +
       " was not found in " +
       sheetName
     );
+
   }
 
+
+  // ---------------------------------------------------
+  // FIND CURRENT EVENT COLUMN
+  //
+  // IMPORTANT:
+  // This searches the CURRENT layout of the sheet.
+  // Therefore attendance follows the event even when
+  // the Events sheet is rearranged.
+  // ---------------------------------------------------
 
   const eventColumn =
     findEventColumn(
@@ -581,7 +980,11 @@ function mirrorAttendance(
       eventName
     );
 
-  if (eventColumn === -1) {
+
+  if (
+    eventColumn === -1
+  ) {
+
     throw new Error(
       "Event not found in " +
       sheetName +
@@ -590,16 +993,28 @@ function mirrorAttendance(
       " - " +
       eventName
     );
+
   }
 
 
+  // ---------------------------------------------------
+  // WRITE ATTENDANCE
+  // ---------------------------------------------------
+
   writeAttendanceMarks(
+
     sheet,
+
     studentRow,
+
     eventColumn,
+
     hours,
+
     proofLink
+
   );
+
 }
 
 
@@ -619,39 +1034,75 @@ function writeAttendanceMarks(
 ) {
 
   const hourMap = {
+
     "1st Hour": 0,
+
     "2nd Hour": 1,
+
     "3rd Hour": 2,
+
     "4th Hour": 3,
+
     "5th Hour": 4,
+
     "6th Hour": 5
+
   };
 
 
   const values = [
-    ["", "", "", "", "", ""]
+    [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
   ];
+
 
   const richText = [
-    [],
+    []
   ];
+
 
   const notes = [
-    ["", "", "", "", "", ""]
+    [
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ]
   ];
 
 
-  for (let i = 0; i < 6; i++) {
+  // ---------------------------------------------------
+  // INITIALIZE RICH TEXT
+  // ---------------------------------------------------
+
+  for (
+    let i = 0;
+    i < 6;
+    i++
+  ) {
 
     richText[0][i] =
       SpreadsheetApp
         .newRichTextValue()
         .setText("")
         .build();
+
   }
 
 
-  hours.forEach(function (hour) {
+  // ---------------------------------------------------
+  // APPLY MARKS
+  // ---------------------------------------------------
+
+  hours.forEach(function(hour) {
 
     if (
       !Object.prototype.hasOwnProperty.call(
@@ -659,7 +1110,9 @@ function writeAttendanceMarks(
         hour
       )
     ) {
+
       return;
+
     }
 
 
@@ -674,8 +1127,12 @@ function writeAttendanceMarks(
     richText[0][offset] =
       SpreadsheetApp
         .newRichTextValue()
-        .setText(CONFIG.MARK)
-        .setLinkUrl(proofLink)
+        .setText(
+          CONFIG.MARK
+        )
+        .setLinkUrl(
+          proofLink
+        )
         .build();
 
 
@@ -684,8 +1141,13 @@ function writeAttendanceMarks(
       hour +
       "\n\nProof:\n" +
       proofLink;
+
   });
 
+
+  // ---------------------------------------------------
+  // RANGE
+  // ---------------------------------------------------
 
   const range =
     sheet.getRange(
@@ -697,97 +1159,156 @@ function writeAttendanceMarks(
 
 
   // One write for values
-  range.setValues(values);
+
+  range.setValues(
+    values
+  );
 
 
   // One write for rich text
-  range.setRichTextValues(richText);
+
+  range.setRichTextValues(
+    richText
+  );
 
 
   // One write for notes
-  range.setNotes(notes);
+
+  range.setNotes(
+    notes
+  );
 
 
-  range.setHorizontalAlignment("center");
+  range.setHorizontalAlignment(
+    "center"
+  );
+
 }
 
 
 // =====================================================
 // REBUILD EVERYTHING
 //
-// Used when a response is manually edited/deleted.
+// This is the important function for dynamic Events.
 //
-// This is NOT used during normal form submission.
+// It:
+//   1. Clears attendance from IT1/IT2/IT3
+//   2. Reads every Attendance Responses row
+//   3. Finds the CURRENT event position
+//   4. Recreates every P
+//
+// Therefore if an event moves, its attendance moves
+// with it.
 // =====================================================
 
 function rebuildAllAttendanceSheets() {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp
+      .getActiveSpreadsheet();
+
 
   const responseSheet =
-    ss.getSheetByName(CONFIG.RESPONSE_SHEET);
+    ss.getSheetByName(
+      CONFIG.RESPONSE_SHEET
+    );
+
 
   if (!responseSheet) {
+
     throw new Error(
       'Sheet "Attendance Responses" was not found.'
     );
+
   }
 
 
-  // ---------------------------------------------------
+  // ===================================================
   // CLEAR ATTENDANCE AREA
-  // ---------------------------------------------------
+  // ===================================================
 
-  CONFIG.SECTION_SHEETS.forEach(function (sheetName) {
+  CONFIG.SECTION_SHEETS.forEach(
+    function(sheetName) {
 
-    const sheet =
-      ss.getSheetByName(sheetName);
+      const sheet =
+        ss.getSheetByName(
+          sheetName
+        );
 
-    if (!sheet) {
-      return;
+
+      if (!sheet) {
+
+        return;
+
+      }
+
+
+      const lastRow =
+        sheet.getLastRow();
+
+
+      const lastColumn =
+        sheet.getLastColumn();
+
+
+      if (
+        lastRow <
+        CONFIG.HEADER_ROW ||
+        lastColumn <
+        CONFIG.FIRST_EVENT_COLUMN
+      ) {
+
+        return;
+
+      }
+
+
+      const range =
+        sheet.getRange(
+
+          CONFIG.HEADER_ROW,
+
+          CONFIG.FIRST_EVENT_COLUMN,
+
+          lastRow -
+            CONFIG.HEADER_ROW +
+            1,
+
+          lastColumn -
+            CONFIG.FIRST_EVENT_COLUMN +
+            1
+
+        );
+
+
+      // ------------------------------------------------
+      // ONLY REMOVE ATTENDANCE DATA
+      //
+      // Formatting remains untouched.
+      // ------------------------------------------------
+
+      range.clearContent();
+
+      range.clearNote();
+
     }
-
-    const lastRow =
-      sheet.getLastRow();
-
-    const lastColumn =
-      sheet.getLastColumn();
-
-    if (
-      lastRow < CONFIG.HEADER_ROW ||
-      lastColumn < CONFIG.FIRST_EVENT_COLUMN
-    ) {
-      return;
-    }
+  );
 
 
-    const range =
-      sheet.getRange(
-        CONFIG.HEADER_ROW,
-        CONFIG.FIRST_EVENT_COLUMN,
-        lastRow - CONFIG.HEADER_ROW + 1,
-        lastColumn - CONFIG.FIRST_EVENT_COLUMN + 1
-      );
-
-
-    // Only remove attendance data.
-    // Formatting remains untouched.
-    range.clearContent();
-    range.clearNote();
-
-  });
-
-
-  // ---------------------------------------------------
+  // ===================================================
   // READ RESPONSES
-  // ---------------------------------------------------
+  // ===================================================
 
   const lastRow =
     responseSheet.getLastRow();
 
-  if (lastRow < 2) {
+
+  if (
+    lastRow < 2
+  ) {
+
     return;
+
   }
 
 
@@ -802,67 +1323,104 @@ function rebuildAllAttendanceSheets() {
       .getDisplayValues();
 
 
-  // ---------------------------------------------------
+  // ===================================================
   // MIRROR EVERY RESPONSE
-  // ---------------------------------------------------
+  // ===================================================
 
-  responses.forEach(function (row) {
+  responses.forEach(
+    function(row) {
 
-    const rollNumber = row[2];
-    const section = row[3];
-    const date = row[4];
-    const company = row[5];
-    const eventName = row[6];
-    const hoursText = row[7];
-    const proofLink = row[8];
+      const rollNumber =
+        row[2];
 
 
-    if (
-      !rollNumber ||
-      !section ||
-      !date ||
-      !company ||
-      !eventName ||
-      !hoursText
-    ) {
-      return;
+      const section =
+        row[3];
+
+
+      const date =
+        row[4];
+
+
+      const company =
+        row[5];
+
+
+      const eventName =
+        row[6];
+
+
+      const hoursText =
+        row[7];
+
+
+      const proofLink =
+        row[8];
+
+
+      if (
+        !rollNumber ||
+        !section ||
+        !date ||
+        !company ||
+        !eventName ||
+        !hoursText
+      ) {
+
+        return;
+
+      }
+
+
+      const hours =
+        hoursText
+          .split(",")
+          .map(function(h) {
+
+            return h.trim();
+
+          })
+          .filter(Boolean);
+
+
+      try {
+
+        mirrorAttendance(
+
+          ss,
+
+          rollNumber,
+
+          section,
+
+          date,
+
+          company,
+
+          eventName,
+
+          hours,
+
+          proofLink
+
+        );
+
+      } catch (error) {
+
+        console.log(
+
+          "Could not mirror " +
+          rollNumber +
+          ": " +
+          error.message
+
+        );
+
+      }
+
     }
+  );
 
-
-    const hours =
-      hoursText
-        .split(",")
-        .map(function (h) {
-          return h.trim();
-        })
-        .filter(Boolean);
-
-
-    try {
-
-      mirrorAttendance(
-        ss,
-        rollNumber,
-        section,
-        date,
-        company,
-        eventName,
-        hours,
-        proofLink
-      );
-
-    } catch (error) {
-
-      console.log(
-        "Could not mirror " +
-        rollNumber +
-        ": " +
-        error.message
-      );
-
-    }
-
-  });
 }
 
 
@@ -874,83 +1432,148 @@ function manualSync() {
 
   rebuildAllAttendanceSheets();
 
+
   SpreadsheetApp
     .getUi()
     .alert(
+
       "Attendance Sync",
+
       "IT1, IT2 and IT3 have been synced from Attendance Responses.",
-      SpreadsheetApp.getUi().ButtonSet.OK
+
+      SpreadsheetApp
+        .getUi()
+        .ButtonSet.OK
+
     );
+
 }
 
 
 // =====================================================
 // AUTO SYNC - EDIT
 //
-// If someone changes a response manually,
-// rebuild the attendance sheets.
+// Handles manual edits in:
+//
+//   Attendance Responses
+//   Events
+//
+// This is what makes Events dynamic.
 // =====================================================
 
-function onResponseEdit(e) {
+function onAttendanceSheetEdit(e) {
 
   try {
 
-    if (!e || !e.range) {
+    if (
+      !e ||
+      !e.range
+    ) {
+
       return;
+
     }
+
 
     const sheet =
       e.range.getSheet();
 
+
+    const sheetName =
+      sheet.getName();
+
+
+    // -------------------------------------------------
+    // ONLY WATCH THESE TWO SHEETS
+    // -------------------------------------------------
+
     if (
-      sheet.getName() !==
-      CONFIG.RESPONSE_SHEET
+      sheetName !==
+        CONFIG.RESPONSE_SHEET &&
+      sheetName !==
+        CONFIG.EVENTS_SHEET
     ) {
+
       return;
+
     }
+
 
     rebuildAllAttendanceSheets();
 
   } catch (error) {
 
     console.log(
-      "Response edit sync error: " +
+
+      "Attendance edit sync error: " +
       error.message
+
     );
 
   }
+
 }
 
 
 // =====================================================
-// AUTO SYNC - ROW DELETION
+// AUTO SYNC - STRUCTURAL CHANGES
 //
-// Deleting a row is a CHANGE event rather than a normal
-// edit, so this handles deleted response rows.
+// Handles changes such as:
+//
+//   REMOVE_ROW
+//   INSERT_ROW
+//   REMOVE_COLUMN
+//   INSERT_COLUMN
+//
+// Useful when Events are inserted/deleted/moved
+// structurally.
 // =====================================================
 
-function onResponseChange(e) {
+function onAttendanceChange(e) {
 
   try {
 
     if (!e) {
+
       return;
+
     }
 
+
+    const changeTypes = [
+
+      "REMOVE_ROW",
+
+      "INSERT_ROW",
+
+      "REMOVE_COLUMN",
+
+      "INSERT_COLUMN"
+
+    ];
+
+
     if (
-      e.changeType === "REMOVE_ROW"
+      changeTypes.includes(
+        e.changeType
+      )
     ) {
+
       rebuildAllAttendanceSheets();
+
     }
 
   } catch (error) {
 
     console.log(
-      "Response delete sync error: " +
+
+      "Attendance change sync error: " +
       error.message
+
     );
 
   }
+
 }
 
 
@@ -958,58 +1581,116 @@ function onResponseChange(e) {
 // SETUP TRIGGERS
 //
 // Run this ONCE manually from Apps Script.
+//
+// This deletes old versions of the attendance triggers
+// and creates the new ones.
 // =====================================================
 
 function setupAttendanceTriggers() {
 
   const ss =
-    SpreadsheetApp.getActiveSpreadsheet();
+    SpreadsheetApp
+      .getActiveSpreadsheet();
 
 
-  // Delete old versions of our triggers
+  // ===================================================
+  // DELETE OLD VERSIONS OF OUR TRIGGERS
+  // ===================================================
 
   ScriptApp
     .getProjectTriggers()
-    .forEach(function (trigger) {
+    .forEach(
+      function(trigger) {
 
-      const handler =
-        trigger.getHandlerFunction();
+        const handler =
+          trigger.getHandlerFunction();
 
-      if (
-        handler === "onResponseEdit" ||
-        handler === "onResponseChange"
-      ) {
-        ScriptApp.deleteTrigger(trigger);
+
+        if (
+
+          handler ===
+            "onResponseEdit" ||
+
+          handler ===
+            "onResponseChange" ||
+
+          handler ===
+            "onAttendanceSheetEdit" ||
+
+          handler ===
+            "onAttendanceChange"
+
+        ) {
+
+          ScriptApp
+            .deleteTrigger(
+              trigger
+            );
+
+        }
+
       }
+    );
 
-    });
 
-
-  // Trigger for normal edits
+  // ===================================================
+  // EDIT TRIGGER
+  //
+  // Handles:
+  //   Attendance Responses edits
+  //   Events edits
+  // ===================================================
 
   ScriptApp
-    .newTrigger("onResponseEdit")
+
+    .newTrigger(
+      "onAttendanceSheetEdit"
+    )
+
     .forSpreadsheet(ss)
+
     .onEdit()
+
     .create();
 
 
-  // Trigger for deleted rows
+  // ===================================================
+  // CHANGE TRIGGER
+  //
+  // Handles structural changes.
+  // ===================================================
 
   ScriptApp
-    .newTrigger("onResponseChange")
+
+    .newTrigger(
+      "onAttendanceChange"
+    )
+
     .forSpreadsheet(ss)
+
     .onChange()
+
     .create();
 
+
+  // ===================================================
+  // CONFIRMATION
+  // ===================================================
 
   SpreadsheetApp
     .getUi()
     .alert(
+
       "Attendance Sync",
-      "Automatic response syncing has been enabled.",
-      SpreadsheetApp.getUi().ButtonSet.OK
+
+      "Automatic response and event syncing has been enabled.",
+
+      SpreadsheetApp
+        .getUi()
+        .ButtonSet.OK
+
     );
+
 }
 
 
@@ -1021,15 +1702,21 @@ function onOpen() {
 
   SpreadsheetApp
     .getUi()
-    .createMenu("🔄 Attendance")
+
+    .createMenu(
+      "🔄 Attendance"
+    )
+
     .addItem(
       "Sync Attendance Now",
       "manualSync"
     )
+
     .addItem(
       "Setup Auto-Sync",
       "setupAttendanceTriggers"
     )
+
     .addToUi();
 
 }
@@ -1047,21 +1734,31 @@ function findStudentRow(
   const lastRow =
     sheet.getLastRow();
 
+
   if (
     lastRow <
     CONFIG.HEADER_ROW
   ) {
+
     return -1;
+
   }
 
 
   const values =
     sheet
       .getRange(
+
         CONFIG.HEADER_ROW,
+
         CONFIG.ROLL_COLUMN,
-        lastRow - CONFIG.HEADER_ROW + 1,
+
+        lastRow -
+          CONFIG.HEADER_ROW +
+          1,
+
         1
+
       )
       .getDisplayValues();
 
@@ -1079,12 +1776,17 @@ function findStudentRow(
   ) {
 
     if (
+
       normalizeRollNumber(
         values[i][0]
       ) === target
+
     ) {
 
-      return CONFIG.HEADER_ROW + i;
+      return (
+        CONFIG.HEADER_ROW +
+        i
+      );
 
     }
 
@@ -1092,11 +1794,17 @@ function findStudentRow(
 
 
   return -1;
+
 }
 
 
 // =====================================================
 // FIND EVENT
+//
+// Searches the CURRENT IT sheet layout.
+//
+// This is what allows attendance to follow an event
+// when the Events sheet is rearranged.
 // =====================================================
 
 function findEventColumn(
@@ -1114,7 +1822,9 @@ function findEventColumn(
     lastColumn <
     CONFIG.FIRST_EVENT_COLUMN
   ) {
+
     return -1;
+
   }
 
 
@@ -1124,37 +1834,67 @@ function findEventColumn(
     1;
 
 
+  // ---------------------------------------------------
+  // DATE ROW
+  // ---------------------------------------------------
+
   const dateValues =
     sheet
       .getRange(
+
         CONFIG.DATE_ROW,
+
         CONFIG.FIRST_EVENT_COLUMN,
+
         1,
+
         numberOfColumns
+
       )
       .getDisplayValues()[0];
 
 
+  // ---------------------------------------------------
+  // EVENT ROW
+  // ---------------------------------------------------
+
   const eventValues =
     sheet
       .getRange(
+
         CONFIG.EVENT_ROW,
+
         CONFIG.FIRST_EVENT_COLUMN,
+
         1,
+
         numberOfColumns
+
       )
       .getDisplayValues()[0];
 
 
   const targetDate =
-    normalizeDate(formDate);
+    normalizeDate(
+      formDate
+    );
+
 
   const targetCompany =
-    normalizeText(company);
+    normalizeText(
+      company
+    );
+
 
   const targetEvent =
-    normalizeText(eventName);
+    normalizeText(
+      eventName
+    );
 
+
+  // ===================================================
+  // SEARCH
+  // ===================================================
 
   for (
     let i = 0;
@@ -1167,6 +1907,7 @@ function findEventColumn(
         dateValues[i]
       );
 
+
     const sheetEvent =
       normalizeText(
         eventValues[i]
@@ -1174,84 +1915,128 @@ function findEventColumn(
 
 
     if (!sheetEvent) {
+
       continue;
+
     }
 
 
+    // -------------------------------------------------
+    // DATE MUST MATCH WHEN BOTH DATES EXIST
+    // -------------------------------------------------
+
     if (
+
       targetDate &&
       sheetDate &&
       targetDate !== sheetDate
+
     ) {
+
       continue;
+
     }
 
 
     const companyEvent =
       normalizeText(
+
         targetCompany +
         " - " +
         targetEvent
+
       );
 
 
     const targetCombined =
       normalizeText(
+
         company +
         eventName
+
       );
 
 
-    // Exact match
+    // -------------------------------------------------
+    // EXACT MATCH
+    // -------------------------------------------------
+
     if (
-      sheetEvent === companyEvent
+      sheetEvent ===
+      companyEvent
     ) {
+
       return (
-        CONFIG.FIRST_EVENT_COLUMN + i
+        CONFIG.FIRST_EVENT_COLUMN +
+        i
       );
+
     }
 
 
-    // Company + event
+    // -------------------------------------------------
+    // COMPANY + EVENT
+    // -------------------------------------------------
+
     if (
+
       sheetEvent.includes(
         targetCompany
       ) &&
+
       sheetEvent.includes(
         targetEvent
       )
+
     ) {
+
       return (
-        CONFIG.FIRST_EVENT_COLUMN + i
+        CONFIG.FIRST_EVENT_COLUMN +
+        i
       );
+
     }
 
 
-    // Event only
+    // -------------------------------------------------
+    // EVENT ONLY
+    // -------------------------------------------------
+
     if (
-      sheetEvent === targetEvent
+      sheetEvent ===
+      targetEvent
     ) {
+
       return (
-        CONFIG.FIRST_EVENT_COLUMN + i
+        CONFIG.FIRST_EVENT_COLUMN +
+        i
       );
+
     }
 
 
-    // Company + event without separator
+    // -------------------------------------------------
+    // COMPANY + EVENT WITHOUT SEPARATOR
+    // -------------------------------------------------
+
     if (
       sheetEvent.includes(
         targetCombined
       )
     ) {
+
       return (
-        CONFIG.FIRST_EVENT_COLUMN + i
+        CONFIG.FIRST_EVENT_COLUMN +
+        i
       );
+
     }
 
   }
 
 
   return -1;
+
 }
 
 
@@ -1259,15 +2044,24 @@ function findEventColumn(
 // NORMALIZE SECTION
 // =====================================================
 
-function normalizeSection(section) {
+function normalizeSection(
+  section
+) {
 
-  let value =
-    String(section || "")
-      .trim()
-      .toUpperCase()
-      .replace(/-/g, "");
+  const value =
+    String(
+      section || ""
+    )
+    .trim()
+    .toUpperCase()
+    .replace(
+      /-/g,
+      ""
+    );
+
 
   return value;
+
 }
 
 
@@ -1275,12 +2069,19 @@ function normalizeSection(section) {
 // NORMALIZE ROLL
 // =====================================================
 
-function normalizeRollNumber(value) {
+function normalizeRollNumber(
+  value
+) {
 
-  return String(value || "")
-    .trim()
-    .replace(/\s+/g, "")
-    .toUpperCase();
+  return String(
+    value || ""
+  )
+  .trim()
+  .replace(
+    /\s+/g,
+    ""
+  )
+  .toUpperCase();
 
 }
 
@@ -1289,15 +2090,30 @@ function normalizeRollNumber(value) {
 // NORMALIZE TEXT
 // =====================================================
 
-function normalizeText(value) {
+function normalizeText(
+  value
+) {
 
-  return String(value || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[–—−]/g, "-")
-    .replace(/\s+/g, " ")
-    .replace(/\s*-\s*/g, "-")
-    .replace(/[.,]/g, "");
+  return String(
+    value || ""
+  )
+  .toLowerCase()
+  .trim()
+  .replace(
+    /[–—−]/g,
+    "-"
+  )
+  .replace(
+    /\s+/g,
+    " "
+  )
+  .replace(
+    /\s*-\s*/g,
+    "-"
+  )
+  .replace(
+    /[.,]/g,
+    "");
 
 }
 
@@ -1306,34 +2122,65 @@ function normalizeText(value) {
 // NORMALIZE DATE
 // =====================================================
 
-function normalizeDate(value) {
+function normalizeDate(
+  value
+) {
 
   if (!value) {
+
     return "";
+
   }
 
 
+  // ---------------------------------------------------
+  // REAL DATE OBJECT
+  // ---------------------------------------------------
+
   if (
-    Object.prototype.toString.call(value) ===
+
+    Object.prototype.toString.call(
+      value
+    ) ===
     "[object Date]"
+
   ) {
 
-    if (isNaN(value.getTime())) {
+    if (
+      isNaN(
+        value.getTime()
+      )
+    ) {
+
       return "";
+
     }
 
-    return Utilities.formatDate(
-      value,
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd"
-    );
+
+    return Utilities
+      .formatDate(
+
+        value,
+
+        Session
+          .getScriptTimeZone(),
+
+        "yyyy-MM-dd"
+
+      );
 
   }
 
 
   const text =
-    String(value).trim();
+    String(
+      value
+    ).trim();
 
+
+  // ---------------------------------------------------
+  // YYYY-MM-DD
+  // ---------------------------------------------------
 
   let match =
     text.match(
@@ -1344,15 +2191,21 @@ function normalizeDate(value) {
   if (match) {
 
     return (
+
       match[1] +
       "-" +
       pad(match[2]) +
       "-" +
       pad(match[3])
+
     );
 
   }
 
+
+  // ---------------------------------------------------
+  // DD.MM.YYYY
+  // ---------------------------------------------------
 
   match =
     text.match(
@@ -1363,15 +2216,21 @@ function normalizeDate(value) {
   if (match) {
 
     return (
+
       match[3] +
       "-" +
       pad(match[2]) +
       "-" +
       pad(match[1])
+
     );
 
   }
 
+
+  // ---------------------------------------------------
+  // DD/MM/YYYY
+  // ---------------------------------------------------
 
   match =
     text.match(
@@ -1382,32 +2241,51 @@ function normalizeDate(value) {
   if (match) {
 
     return (
+
       match[3] +
       "-" +
       pad(match[2]) +
       "-" +
       pad(match[1])
+
     );
 
   }
 
 
+  // ---------------------------------------------------
+  // FALLBACK DATE PARSER
+  // ---------------------------------------------------
+
   const parsed =
-    new Date(text);
-
-
-  if (!isNaN(parsed.getTime())) {
-
-    return Utilities.formatDate(
-      parsed,
-      Session.getScriptTimeZone(),
-      "yyyy-MM-dd"
+    new Date(
+      text
     );
+
+
+  if (
+    !isNaN(
+      parsed.getTime()
+    )
+  ) {
+
+    return Utilities
+      .formatDate(
+
+        parsed,
+
+        Session
+          .getScriptTimeZone(),
+
+        "yyyy-MM-dd"
+
+      );
 
   }
 
 
   return "";
+
 }
 
 
@@ -1415,9 +2293,16 @@ function normalizeDate(value) {
 // PAD
 // =====================================================
 
-function pad(value) {
+function pad(
+  value
+) {
 
-  return String(value)
-    .padStart(2, "0");
+  return String(
+    value
+  )
+  .padStart(
+    2,
+    "0"
+  );
 
 }
