@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -18,24 +17,16 @@
 
   <style>
 
-    /* =================================================
-       GLOBAL
-    ================================================= */
-
     * {
       box-sizing: border-box;
     }
-
 
     html {
       scroll-behavior: smooth;
     }
 
-
     body {
-
       margin: 0;
-
       min-height: 100vh;
 
       font-family:
@@ -48,36 +39,30 @@
         sans-serif;
 
       background: #f3f7f4;
-
       color: #374151;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        CONTAINER
-    ================================================= */
+    ========================================= */
 
     .container {
-
       width: 100%;
-
       max-width: 700px;
 
       margin: 0 auto;
 
       padding:
         32px 18px 50px;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        HEADER
-    ================================================= */
+    ========================================= */
 
     .header {
-
       position: relative;
 
       background: #ffffff;
@@ -97,31 +82,25 @@
       box-shadow:
         0 3px 12px
         rgba(0, 0, 0, 0.05);
-
     }
 
 
     .header::before {
-
       content: "";
 
       position: absolute;
 
       top: 0;
-
       left: 0;
-
       right: 0;
 
       height: 5px;
 
       background: #8fc9a8;
-
     }
 
 
     .header h1 {
-
       margin:
         4px 0 10px;
 
@@ -132,12 +111,10 @@
       letter-spacing: -0.4px;
 
       color: #26352c;
-
     }
 
 
     .header p {
-
       margin:
         7px 0;
 
@@ -146,23 +123,19 @@
       line-height: 1.6;
 
       color: #6b7280;
-
     }
 
 
     .header p strong {
-
       color: #4b5563;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        MESSAGE
-    ================================================= */
+    ========================================= */
 
     .message {
-
       display: none;
 
       padding:
@@ -181,61 +154,45 @@
 
       animation:
         messageSlide 0.25s ease;
-
     }
 
 
     .success {
-
       background: #edf8f1;
-
       color: #2f6b45;
-
       border-color: #c5e5d0;
-
     }
 
 
     .error {
-
       background: #fef2f2;
-
       color: #b91c1c;
-
       border-color: #fecaca;
-
     }
 
 
     @keyframes messageSlide {
 
       from {
-
         opacity: 0;
-
         transform:
           translateY(-6px);
-
       }
 
       to {
-
         opacity: 1;
-
         transform:
           translateY(0);
-
       }
 
     }
 
 
-    /* =================================================
+    /* =========================================
        CARD
-    ================================================= */
+    ========================================= */
 
     .card {
-
       background: #ffffff;
 
       border:
@@ -255,41 +212,33 @@
       transition:
         box-shadow 0.2s ease,
         border-color 0.2s ease;
-
     }
 
 
     .card:hover {
-
       border-color: #cbd8d0;
 
       box-shadow:
         0 4px 14px
         rgba(0, 0, 0, 0.05);
-
     }
 
 
-    /* =================================================
+    /* =========================================
        QUESTIONS
-    ================================================= */
+    ========================================= */
 
     .question {
-
       margin-bottom: 28px;
-
     }
 
 
     .question:last-child {
-
       margin-bottom: 0;
-
     }
 
 
     label {
-
       display: block;
 
       margin-bottom: 10px;
@@ -299,22 +248,19 @@
       font-weight: 600;
 
       color: #374151;
-
     }
 
 
     .required {
-
       color: #dc2626;
 
       margin-left: 2px;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        INPUTS
-    ================================================= */
+    ========================================= */
 
     input[type="text"],
     input[type="date"],
@@ -347,14 +293,11 @@
         border-color 0.2s ease,
         box-shadow 0.2s ease,
         background 0.2s ease;
-
     }
 
 
     input::placeholder {
-
       color: #9ca3af;
-
     }
 
 
@@ -364,7 +307,6 @@
     select:hover {
 
       border-color: #9bb9a5;
-
     }
 
 
@@ -380,18 +322,15 @@
         rgba(118, 173, 141, 0.14);
 
       background: #ffffff;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        DATE
-    ================================================= */
+    ========================================= */
 
     input[type="date"] {
-
       cursor: pointer;
-
     }
 
 
@@ -402,15 +341,13 @@
       opacity: 0.55;
 
       width: 18px;
-
       height: 18px;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        SELECT
-    ================================================= */
+    ========================================= */
 
     select {
 
@@ -447,7 +384,6 @@
 
       background-repeat:
         no-repeat;
-
     }
 
 
@@ -460,13 +396,12 @@
       cursor: not-allowed;
 
       border-color: #e1e7e3;
-
     }
 
 
-    /* =================================================
-       EVENT INFORMATION
-    ================================================= */
+    /* =========================================
+       EVENT INFO
+    ========================================= */
 
     .event-info {
 
@@ -489,13 +424,8 @@
       font-size: 13px;
 
       line-height: 1.5;
-
     }
 
-
-    /* =================================================
-       NO EVENTS
-    ================================================= */
 
     .no-events {
 
@@ -516,13 +446,8 @@
       font-size: 13px;
 
       line-height: 1.5;
-
     }
 
-
-    /* =================================================
-       LOADING
-    ================================================= */
 
     .event-loading {
 
@@ -531,16 +456,18 @@
       color: #7a847e;
 
       font-size: 13px;
-
     }
 
+
+    /* =========================================
+       SPINNER
+    ========================================= */
 
     .spinner {
 
       display: inline-block;
 
       width: 14px;
-
       height: 14px;
 
       margin-right: 7px;
@@ -558,7 +485,6 @@
         spin 0.7s linear infinite;
 
       vertical-align: -2px;
-
     }
 
 
@@ -567,7 +493,6 @@
       border-color: #d5e7db;
 
       border-top-color: #76ad8d;
-
     }
 
 
@@ -584,9 +509,9 @@
     }
 
 
-    /* =================================================
+    /* =========================================
        RADIO
-    ================================================= */
+    ========================================= */
 
     .radio-option {
 
@@ -609,7 +534,6 @@
       transition:
         background 0.15s ease,
         border-color 0.15s ease;
-
     }
 
 
@@ -618,7 +542,6 @@
       background: #f4f9f6;
 
       border-color: #dcebe1;
-
     }
 
 
@@ -629,7 +552,6 @@
       -webkit-appearance: none;
 
       width: 19px;
-
       height: 19px;
 
       margin:
@@ -645,14 +567,12 @@
       position: relative;
 
       flex-shrink: 0;
-
     }
 
 
     .radio-option input:checked {
 
       border-color: #76ad8d;
-
     }
 
 
@@ -663,7 +583,6 @@
       position: absolute;
 
       width: 9px;
-
       height: 9px;
 
       background: #76ad8d;
@@ -671,9 +590,7 @@
       border-radius: 50%;
 
       top: 3px;
-
       left: 3px;
-
     }
 
 
@@ -684,13 +601,12 @@
       color: #4b5563;
 
       cursor: pointer;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        CHECKBOX
-    ================================================= */
+    ========================================= */
 
     .checkbox-option {
 
@@ -713,7 +629,6 @@
       transition:
         background 0.15s ease,
         border-color 0.15s ease;
-
     }
 
 
@@ -722,7 +637,6 @@
       background: #f4f9f6;
 
       border-color: #dcebe1;
-
     }
 
 
@@ -733,7 +647,6 @@
       -webkit-appearance: none;
 
       width: 19px;
-
       height: 19px;
 
       margin:
@@ -749,7 +662,6 @@
       position: relative;
 
       flex-shrink: 0;
-
     }
 
 
@@ -758,7 +670,6 @@
       background: #76ad8d;
 
       border-color: #76ad8d;
-
     }
 
 
@@ -775,9 +686,7 @@
       font-weight: 700;
 
       left: 3px;
-
       top: -1px;
-
     }
 
 
@@ -788,13 +697,12 @@
       color: #4b5563;
 
       cursor: pointer;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        HELPER
-    ================================================= */
+    ========================================= */
 
     .helper-text {
 
@@ -807,14 +715,11 @@
       line-height: 1.5;
 
       overflow-wrap: anywhere;
-
     }
 
 
     .helper-text b {
-
       color: #5d6962;
-
     }
 
 
@@ -823,20 +728,17 @@
       color: #5f9878;
 
       text-decoration: none;
-
     }
 
 
     .helper-text a:hover {
-
       text-decoration: underline;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        SUBMIT
-    ================================================= */
+    ========================================= */
 
     .submit-container {
 
@@ -848,7 +750,6 @@
       align-items: center;
 
       gap: 15px;
-
     }
 
 
@@ -868,7 +769,6 @@
         transform 0.15s ease,
         box-shadow 0.15s ease,
         background 0.15s ease;
-
     }
 
 
@@ -876,7 +776,6 @@
 
       transform:
         translateY(1px);
-
     }
 
 
@@ -898,7 +797,6 @@
       box-shadow:
         0 3px 8px
         rgba(92, 137, 108, 0.22);
-
     }
 
 
@@ -909,7 +807,6 @@
       box-shadow:
         0 5px 12px
         rgba(92, 137, 108, 0.28);
-
     }
 
 
@@ -920,7 +817,6 @@
       cursor: not-allowed;
 
       box-shadow: none;
-
     }
 
 
@@ -934,7 +830,6 @@
         10px 12px;
 
       border-radius: 8px;
-
     }
 
 
@@ -943,13 +838,12 @@
       background: #f1f4f2;
 
       color: #4b5563;
-
     }
 
 
-    /* =================================================
+    /* =========================================
        MOBILE
-    ================================================= */
+    ========================================= */
 
     @media (max-width: 600px) {
 
@@ -957,7 +851,6 @@
 
         padding:
           12px 10px 30px;
-
       }
 
 
@@ -969,21 +862,16 @@
           26px 20px 22px;
 
         margin-bottom: 10px;
-
       }
 
 
       .header h1 {
-
         font-size: 23px;
-
       }
 
 
       .header p {
-
         font-size: 13px;
-
       }
 
 
@@ -995,14 +883,11 @@
           20px 18px;
 
         margin-bottom: 10px;
-
       }
 
 
       .question {
-
         margin-bottom: 24px;
-
       }
 
 
@@ -1011,7 +896,6 @@
         flex-direction: row;
 
         gap: 10px;
-
       }
 
 
@@ -1020,22 +904,19 @@
         flex: 1;
 
         height: 46px;
-
       }
 
     }
 
 
-    /* =================================================
+    /* =========================================
        VERY SMALL PHONES
-    ================================================= */
+    ========================================= */
 
     @media (max-width: 380px) {
 
       .header h1 {
-
         font-size: 21px;
-
       }
 
 
@@ -1043,7 +924,6 @@
 
         padding:
           18px 15px;
-
       }
 
 
@@ -1054,14 +934,12 @@
 
         align-items:
           stretch;
-
       }
 
 
       .clear-button {
 
         text-align: center;
-
       }
 
     }
@@ -1077,18 +955,16 @@
 <div class="container">
 
 
-  <!-- =================================================
-       HEADER
-  ================================================= -->
+  <!-- HEADER -->
 
   <div class="header">
 
     <h1>
-      IT Placement Attendance 2026-27
+      IT Placement Attendance
     </h1>
 
     <p>
-      Please fill out this form to record your placemet attendance.
+      Please fill the form to record your placement attendance.
     </p>
 
     <p>
@@ -1100,9 +976,7 @@
   </div>
 
 
-  <!-- =================================================
-       MESSAGE
-  ================================================= -->
+  <!-- MESSAGE -->
 
   <div
     id="message"
@@ -1110,18 +984,14 @@
   </div>
 
 
-  <!-- =================================================
-       FORM
-  ================================================= -->
+  <!-- FORM -->
 
   <form
     id="attendanceForm"
     novalidate>
 
 
-    <!-- =================================================
-         BASIC DETAILS
-    ================================================= -->
+    <!-- BASIC DETAILS -->
 
     <div class="card">
 
@@ -1139,6 +1009,7 @@
           </span>
 
         </label>
+
 
         <input
           type="text"
@@ -1164,10 +1035,11 @@
 
         </label>
 
+
         <input
           type="text"
           id="rollNumber"
-          placeholder="160123733XXXX"
+          placeholder="160123737XXX"
           required>
 
       </div>
@@ -1231,12 +1103,11 @@
 
       </div>
 
+
     </div>
 
 
-    <!-- =================================================
-         DATE + EVENT
-    ================================================= -->
+    <!-- DATE + EVENT -->
 
     <div class="card">
 
@@ -1321,12 +1192,11 @@
 
       </div>
 
+
     </div>
 
 
-    <!-- =================================================
-         CLASS HOURS
-    ================================================= -->
+    <!-- CLASS HOURS -->
 
     <div class="card">
 
@@ -1431,9 +1301,7 @@
     </div>
 
 
-    <!-- =================================================
-         PROOF
-    ================================================= -->
+    <!-- PROOF -->
 
     <div class="card">
 
@@ -1463,8 +1331,8 @@
           <b>Drive folder:</b>
 
           <a
-            href="https://drive.google.com/drive/folders/1uGUqN0h2Ftk8oZZXTQ_l9-QNonOktQwK?usp=sharing"
-            target="_blank">
+            href="https://drive.google.com/drive/folders/1uGUqN0h2Ftk8oZZXTQ_l9-QNonOktQwK?usp=drive_link"
+          >
 
             Open Drive Folder
 
@@ -1477,9 +1345,7 @@
     </div>
 
 
-    <!-- =================================================
-         SUBMIT
-    ================================================= -->
+    <!-- SUBMIT -->
 
     <div class="card">
 
@@ -1511,6 +1377,7 @@
 
   </form>
 
+
 </div>
 
 
@@ -1532,36 +1399,24 @@ function loadEvents() {
 
   google.script.run
 
-    .withSuccessHandler(
-      function(events) {
+    .withSuccessHandler(function(events) {
 
-        allEvents =
-          Array.isArray(events)
-            ? events
-            : [];
+      allEvents =
+        Array.isArray(events)
+          ? events
+          : [];
 
-        console.log(
-          "Events loaded:",
-          allEvents
-        );
+    })
 
-      }
-    )
+    .withFailureHandler(function(error) {
 
-    .withFailureHandler(
-      function(error) {
+      showMessage(
+        "Could not load events: " +
+        getErrorMessage(error),
+        "error"
+      );
 
-        showMessage(
-
-          "Could not load events: " +
-          getErrorMessage(error),
-
-          "error"
-
-        );
-
-      }
-    )
+    })
 
     .getEvents();
 
@@ -1598,32 +1453,20 @@ function updateEventDropdown(
 ) {
 
   const eventSelect =
-    document.getElementById(
-      "event"
-    );
-
+    document.getElementById("event");
 
   const loading =
-    document.getElementById(
-      "eventLoading"
-    );
-
+    document.getElementById("eventLoading");
 
   const noEvents =
-    document.getElementById(
-      "noEvents"
-    );
-
+    document.getElementById("noEvents");
 
   const eventInfo =
-    document.getElementById(
-      "eventInfo"
-    );
+    document.getElementById("eventInfo");
 
 
   eventSelect.innerHTML =
     '<option value="">Select an event</option>';
-
 
   eventSelect.disabled =
     true;
@@ -1631,7 +1474,6 @@ function updateEventDropdown(
 
   noEvents.style.display =
     "none";
-
 
   eventInfo.style.display =
     "none";
@@ -1643,7 +1485,6 @@ function updateEventDropdown(
       '<option value="">First select a date</option>';
 
     return;
-
   }
 
 
@@ -1652,16 +1493,14 @@ function updateEventDropdown(
 
 
   const matchingEvents =
-    allEvents.filter(
-      function(item) {
+    allEvents.filter(function(item) {
 
-        return (
-          item.date ===
-          selectedDate
-        );
+      return (
+        item.date ===
+        selectedDate
+      );
 
-      }
-    );
+    });
 
 
   loading.style.display =
@@ -1676,43 +1515,30 @@ function updateEventDropdown(
       "block";
 
     return;
-
   }
 
 
-  matchingEvents.forEach(
-    function(item) {
+  matchingEvents.forEach(function(item) {
 
-      const option =
-        document.createElement(
-          "option"
-        );
+    const option =
+      document.createElement("option");
 
 
-      /*
-       * Store only simple strings.
-       *
-       * This avoids the illegal-value issue
-       * that can happen when Apps Script tries
-       * to serialize unexpected values.
-       */
-
-      option.value =
-        item.company +
-        "|||" +
-        item.event;
+    option.value =
+      item.company +
+      "|||" +
+      item.event;
 
 
-      option.textContent =
-        item.display;
+    option.textContent =
+      item.display;
 
 
-      eventSelect.appendChild(
-        option
-      );
+    eventSelect.appendChild(
+      option
+    );
 
-    }
-  );
+  });
 
 
   eventSelect.disabled =
@@ -1743,7 +1569,6 @@ document
           "none";
 
         return;
-
       }
 
 
@@ -1800,9 +1625,7 @@ function parseEventValue(
 // =====================================================
 
 document
-  .getElementById(
-    "attendanceForm"
-  )
+  .getElementById("attendanceForm")
   .addEventListener(
     "submit",
     function(e) {
@@ -1816,26 +1639,15 @@ document
         );
 
 
-      submitButton.disabled =
-        true;
-
-
-      submitButton.innerHTML =
-        '<span class="spinner"></span>Submitting...';
-
-
-      // -----------------------------------------------
+      // -------------------------------------------------
       // FULL NAME
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const fullName =
-        String(
-          document
-            .getElementById(
-              "fullName"
-            )
-            .value || ""
-        ).trim();
+        document
+          .getElementById("fullName")
+          .value
+          .trim();
 
 
       if (!fullName) {
@@ -1845,25 +1657,19 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
+      // -------------------------------------------------
       // ROLL NUMBER
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const rollNumber =
-        String(
-          document
-            .getElementById(
-              "rollNumber"
-            )
-            .value || ""
-        ).trim();
+        document
+          .getElementById("rollNumber")
+          .value
+          .trim();
 
 
       if (!rollNumber) {
@@ -1873,16 +1679,13 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
+      // -------------------------------------------------
       // SECTION
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const sectionElement =
         document.querySelector(
@@ -1897,25 +1700,19 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
+      // -------------------------------------------------
       // DATE
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const date =
-        String(
-          document
-            .getElementById(
-              "date"
-            )
-            .value || ""
-        ).trim();
+        document
+          .getElementById("date")
+          .value
+          .trim();
 
 
       if (!date) {
@@ -1925,16 +1722,13 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
+      // -------------------------------------------------
       // EVENT
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const eventSelect =
         document.getElementById(
@@ -1949,10 +1743,7 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
@@ -1972,69 +1763,47 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
-      // CLASS HOURS
-      // -----------------------------------------------
-
-      const hourElements =
-        document.querySelectorAll(
-          'input[name="hours"]:checked'
-        );
-
+      // -------------------------------------------------
+      // HOURS
+      // -------------------------------------------------
 
       const hours =
         Array.from(
-          hourElements
+          document.querySelectorAll(
+            'input[name="hours"]:checked'
+          )
         )
-        .map(
-          function(element) {
+        .map(function(element) {
 
-            return String(
-              element.value
-            ).trim();
+          return element.value;
 
-          }
-        )
-        .filter(Boolean);
+        });
 
 
-      if (
-        hours.length === 0
-      ) {
+      if (hours.length === 0) {
 
         showMessage(
           "Please select at least one class hour.",
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      // -----------------------------------------------
-      // PROOF LINK
-      // -----------------------------------------------
-
-      const proofElement =
-        document.getElementById(
-          "proofLink"
-        );
-
+      // -------------------------------------------------
+      // PROOF
+      // -------------------------------------------------
 
       const proofLink =
-        String(
-          proofElement.value || ""
-        ).trim();
+        document
+          .getElementById("proofLink")
+          .value
+          .trim();
 
 
       if (!proofLink) {
@@ -2044,28 +1813,28 @@ document
           "error"
         );
 
-        resetSubmitButton();
-
         return;
-
       }
 
 
-      /*
-       * The input itself is type="url".
-       *
-       * We intentionally do NOT run:
-       *
-       * new URL(proofLink)
-       *
-       * because that was causing problems
-       * in the Apps Script iframe environment.
-       */
+      if (
+        !/^https?:\/\//i.test(
+          proofLink
+        )
+      ) {
+
+        showMessage(
+          "Please enter a valid proof link.",
+          "error"
+        );
+
+        return;
+      }
 
 
-      // -----------------------------------------------
+      // -------------------------------------------------
       // FORM DATA
-      // -----------------------------------------------
+      // -------------------------------------------------
 
       const formData = {
 
@@ -2076,22 +1845,16 @@ document
           rollNumber,
 
         section:
-          String(
-            sectionElement.value
-          ),
+          sectionElement.value,
 
         date:
           date,
 
         company:
-          String(
-            selectedEvent.company
-          ),
+          selectedEvent.company,
 
         event:
-          String(
-            selectedEvent.event
-          ),
+          selectedEvent.event,
 
         hours:
           hours,
@@ -2102,50 +1865,87 @@ document
       };
 
 
-      console.log(
-        "Submitting:",
-        formData
-      );
+      // -------------------------------------------------
+      // BUTTON
+      // -------------------------------------------------
+
+      submitButton.disabled =
+        true;
+
+      submitButton.innerHTML =
+        '<span class="spinner"></span>Submitting...';
 
 
-      // -----------------------------------------------
-      // SEND TO APPS SCRIPT
-      // -----------------------------------------------
+      hideMessage();
+
+
+      // =================================================
+      // IMPORTANT
+      //
+      // First call:
+      //     ONLY adds response row.
+      //
+      // This is fast.
+      // =================================================
 
       google.script.run
 
         .withSuccessHandler(
           function(response) {
 
-            showMessage(
+            // -------------------------------------------
+            // SHOW SUCCESS IMMEDIATELY
+            // -------------------------------------------
 
+            showMessage(
               response &&
               response.message
-
                 ? response.message
-
                 : "Attendance submitted successfully.",
-
               "success"
-
             );
 
 
-            clearForm(
-              false
-            );
-
+            clearForm(false);
 
             resetSubmitButton();
 
 
             window.scrollTo({
-
               top: 0,
-
               behavior: "smooth"
-
             });
+
+
+            // -------------------------------------------
+            // BACKGROUND MIRROR
+            //
+            // We DO NOT wait for this.
+            // -------------------------------------------
+
+            if (
+              response &&
+              response.row
+            ) {
+
+              google.script.run
+
+                .withFailureHandler(
+                  function(error) {
+
+                    console.log(
+                      "Background sync failed:",
+                      getErrorMessage(error)
+                    );
+
+                  }
+                )
+
+                .syncResponseRow(
+                  response.row
+                );
+
+            }
 
           }
         )
@@ -2154,15 +1954,9 @@ document
           function(error) {
 
             showMessage(
-
-              getErrorMessage(
-                error
-              ),
-
+              getErrorMessage(error),
               "error"
-
             );
-
 
             resetSubmitButton();
 
@@ -2185,7 +1979,6 @@ function clearForm(
   hideMessageAfterClear = true
 ) {
 
-
   document
     .getElementById(
       "attendanceForm"
@@ -2201,7 +1994,6 @@ function clearForm(
 
   eventSelect.innerHTML =
     '<option value="">First select a date</option>';
-
 
   eventSelect.disabled =
     true;
@@ -2273,11 +2065,8 @@ function showMessage(
 
 
   window.scrollTo({
-
     top: 0,
-
     behavior: "smooth"
-
   });
 
 }
@@ -2300,7 +2089,7 @@ function hideMessage() {
 
 
 // =====================================================
-// RESET SUBMIT BUTTON
+// RESET BUTTON
 // =====================================================
 
 function resetSubmitButton() {
@@ -2322,7 +2111,7 @@ function resetSubmitButton() {
 
 
 // =====================================================
-// ERROR MESSAGE HELPER
+// ERROR MESSAGE
 // =====================================================
 
 function getErrorMessage(
@@ -2330,33 +2119,23 @@ function getErrorMessage(
 ) {
 
   if (!error) {
-
     return "An unknown error occurred.";
-
   }
 
 
   if (
     typeof error === "string"
   ) {
-
     return error;
-
   }
 
 
-  if (
-    error.message
-  ) {
-
+  if (error.message) {
     return error.message;
-
   }
 
 
-  return String(
-    error
-  );
+  return String(error);
 
 }
 
